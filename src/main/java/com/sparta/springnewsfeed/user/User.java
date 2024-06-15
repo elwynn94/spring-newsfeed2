@@ -6,6 +6,7 @@ import com.sparta.springnewsfeed.follow.Follow;
 import com.sparta.springnewsfeed.like.CommentLike;
 import com.sparta.springnewsfeed.like.PostLike;
 import com.sparta.springnewsfeed.post.Post;
+import com.sparta.springnewsfeed.user.email.EmailVerification;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,7 +45,6 @@ public class User extends Timestamped {
     @Column(nullable = false, unique = true)
     private String userId;
 
-
     @Column(nullable = false)
     private String password;
 
@@ -67,6 +67,28 @@ public class User extends Timestamped {
     @Column
     private String refreshToken;
 
+    private Long kakaoId;
+
+    public User(String userId, String password, String email, String name, UserStatusEnum status) {
+        this.userId = userId;
+        this.password = password;
+        this.email = email;
+        this.name = name;
+        this.status = status;
+    }
+
+    public User(String userId, String password, String email, UserStatusEnum status, Long kakaoId) {
+        this.userId = userId;
+        this.password = password;
+        this.email = email;
+        this.status = status;
+        this.kakaoId = kakaoId;
+    }
+
+    public User kakaoIdUpdate(Long kakaoId) {
+        this.kakaoId = kakaoId;
+        return this;
+    }
 
     // 엔티티 관계
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

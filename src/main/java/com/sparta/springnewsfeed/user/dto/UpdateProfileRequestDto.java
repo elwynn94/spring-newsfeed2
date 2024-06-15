@@ -1,4 +1,4 @@
-package com.sparta.springnewsfeed.user;
+package com.sparta.springnewsfeed.user.dto;
 
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

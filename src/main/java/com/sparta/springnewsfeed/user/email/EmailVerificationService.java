@@ -1,6 +1,9 @@
-package com.sparta.springnewsfeed.user;
+package com.sparta.springnewsfeed.user.email;
 
 import com.sparta.springnewsfeed.common.ResponseCode;
+import com.sparta.springnewsfeed.user.User;
+import com.sparta.springnewsfeed.user.UserRepository;
+import com.sparta.springnewsfeed.user.UserStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

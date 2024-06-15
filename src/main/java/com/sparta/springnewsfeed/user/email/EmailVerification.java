@@ -1,6 +1,7 @@
-package com.sparta.springnewsfeed.user;
+package com.sparta.springnewsfeed.user.email;
 
 import com.sparta.springnewsfeed.common.Timestamped;
+import com.sparta.springnewsfeed.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

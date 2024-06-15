@@ -1,14 +1,22 @@
 package com.sparta.springnewsfeed.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.springnewsfeed.auth.JwtUtil;
-import com.sparta.springnewsfeed.auth.LoginRequestDto;
 import com.sparta.springnewsfeed.auth.UserDetailsImpl;
 import com.sparta.springnewsfeed.auth.WithdrawRequestDto;
 import com.sparta.springnewsfeed.common.HttpStatusResponseDto;
 import com.sparta.springnewsfeed.common.ResponseCode;
+import com.sparta.springnewsfeed.user.dto.SignupRequestDto;
+import com.sparta.springnewsfeed.user.dto.UpdatePasswordRequestDto;
+import com.sparta.springnewsfeed.user.dto.UpdateProfileRequestDto;
+import com.sparta.springnewsfeed.user.dto.UserInquiryResponseDto;
+import com.sparta.springnewsfeed.user.kakao.KakaoService;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,14 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.stream.Collectors;
@@ -35,23 +36,47 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final KakaoService kakaoService;
+
+
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private HttpServletResponse httpServletResponse;
 
 
     @Autowired
-    public UserController(UserService userService, JwtUtil jwtUtil,UserRepository userRepository) {
+    public UserController(UserService userService, JwtUtil jwtUtil, UserRepository userRepository, KakaoService kakaoService) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.userRepository=userRepository;
+        this.kakaoService = kakaoService;
     }
 
+
+    // 공통 응답 처리 Generic 메서드
+    private <T> ResponseEntity<HttpStatusResponseDto> createResponse(ResponseCode responseCode) {
+        HttpStatusResponseDto response = new HttpStatusResponseDto(responseCode);
+        return new ResponseEntity<>(response, HttpStatus.valueOf(responseCode.getStatusCode()));
+    }
+
+    private <T> ResponseEntity<T> createResponse(T body, HttpStatus status) {
+        return new ResponseEntity<>(body, status);
+    }
+
+
     // 회원가입
+//    @PostMapping("/signup")
+//    public ResponseEntity<HttpStatusResponseDto> signup(@Validated @RequestBody SignupRequestDto requestDto) {
+//        ResponseCode responseCode = userService.signup(requestDto);
+//        HttpStatusResponseDto response = new HttpStatusResponseDto(responseCode);
+//        return new ResponseEntity<>(response, HttpStatus.valueOf(responseCode.getStatusCode()));
+//    }
+
     @PostMapping("/signup")
     public ResponseEntity<HttpStatusResponseDto> signup(@Validated @RequestBody SignupRequestDto requestDto) {
         ResponseCode responseCode = userService.signup(requestDto);
-        HttpStatusResponseDto response = new HttpStatusResponseDto(responseCode);
-        return new ResponseEntity<>(response, HttpStatus.valueOf(responseCode.getStatusCode()));
+        return createResponse(responseCode);
     }
 
     // 프로필 수정
@@ -62,8 +87,7 @@ public class UserController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         String userId = userDetails.getUser().getUserId();
         ResponseCode responseCode = userService.updateProfile(requestDto, profilePicture, userId);
-        HttpStatusResponseDto response = new HttpStatusResponseDto(responseCode);
-        return new ResponseEntity<>(response, HttpStatus.valueOf(responseCode.getStatusCode()));
+        return createResponse(responseCode);
     }
 
     // 비밀번호 변경
@@ -73,8 +97,7 @@ public class UserController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         String userId = userDetails.getUser().getUserId();
         ResponseCode responseCode = userService.updatePassword(requestDto, userId);
-        HttpStatusResponseDto response = new HttpStatusResponseDto(responseCode);
-        return new ResponseEntity<>(response, HttpStatus.valueOf(responseCode.getStatusCode()));
+        return createResponse(responseCode);
     }
 
     // 사용자 프로필 조회
@@ -82,7 +105,7 @@ public class UserController {
     public ResponseEntity<UserInquiryResponseDto> getUserProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         String userId = userDetails.getUser().getUserId();
         UserInquiryResponseDto userProfile = userService.getUserProfile(userId);
-        return new ResponseEntity<>(userProfile, HttpStatus.OK);
+        return createResponse(userProfile, HttpStatus.OK);
     }
 
     // 유효성 검사 실패 예외 처리
@@ -91,10 +114,10 @@ public class UserController {
         String errorMessages = ex.getBindingResult()
                 .getAllErrors()
                 .stream()
-                .map(error -> error.getDefaultMessage())
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
         HttpStatusResponseDto response = new HttpStatusResponseDto(ResponseCode.INVALID_INPUT_VALUE);
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return createResponse(response, HttpStatus.BAD_REQUEST);
     }
 
     // 일반 예외 처리
@@ -108,16 +131,14 @@ public class UserController {
         } else {
             responseCode = ResponseCode.INTERNAL_SERVER_ERROR;
         }
-        HttpStatusResponseDto response = new HttpStatusResponseDto(responseCode);
-        return new ResponseEntity<>(response, HttpStatus.valueOf(responseCode.getStatusCode()));
+        return createResponse(responseCode);
     }
 
     // 기타 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<HttpStatusResponseDto> handleException(Exception ex) {
         ex.printStackTrace();
-        HttpStatusResponseDto response = new HttpStatusResponseDto(ResponseCode.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return createResponse(ResponseCode.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("/logout")
@@ -140,14 +161,11 @@ public class UserController {
         }
 
         // 클라이언트 측 토큰 삭제 요청을 위해 응답 설정
-        return ResponseEntity.ok("Logged out successfully");
+        return createResponse("Logged out successfully", HttpStatus.OK);
     }
-
-
 
     @PostMapping("/withdraw")
     public ResponseEntity<String> withdrawUser(HttpServletRequest request, @RequestBody WithdrawRequestDto requestDto) {
-
         // 헤더에서 토큰을 가져옴
         String accessToken = jwtUtil.getAccessTokenFromHeader(request);
         String refreshToken = jwtUtil.getRefreshTokenFromHeader(request);
@@ -160,12 +178,12 @@ public class UserController {
             // 유저 정보 가져오기
             User user = userRepository.findByUserId(userId).orElse(null);
             if (user == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+                return createResponse("User not found", HttpStatus.NOT_FOUND);
             }
 
             // 비밀번호가 일치하는지 확인
             if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
+                return createResponse("Incorrect password", HttpStatus.UNAUTHORIZED);
             }
 
             // 리프레시 토큰도 유효한지 확인
@@ -176,15 +194,37 @@ public class UserController {
                 userRepository.save(user);
 
                 // 클라이언트 측 토큰 삭제 요청을 위해 응답 설정
-                return ResponseEntity.ok("User deleted successfully");
+                return createResponse("User deleted successfully", HttpStatus.OK);
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+                return createResponse("Invalid refresh token", HttpStatus.UNAUTHORIZED);
             }
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid access token");
+            return createResponse("Invalid access token", HttpStatus.UNAUTHORIZED);
         }
     }
 
+
+    @GetMapping("/kakao/callback")
+    public String kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+        String token = kakaoService.kakaoLogin(code);
+
+        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token.substring(7));
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        return "redirect:/";
     }
+
+    @PostMapping("/loginKakao")
+    public ResponseEntity<String> loginKakao(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+        String token = kakaoService.kakaoLogin(code);
+
+        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token.substring(7));
+        cookie.setPath("/");
+        response.addCookie(cookie);
+        return ResponseEntity.ok("Login successful");
+    }
+}
+
 
 

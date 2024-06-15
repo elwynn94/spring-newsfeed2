@@ -100,13 +100,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         // 데이터베이스에서 사용자 정보 조회
         User user = userRepository.findByUserId(userId).orElse(null);
+        assert user != null;
         log.info("user ID: {}", user.getUserId());
         log.info("user token: {}", user.getRefreshToken().substring(BEARER_PREFIX.length()));
         log.info("refreshToken: {}", refreshToken);
 
         // 사용자가 존재하고, 요청의 리프레시 토큰이 DB에 저장된 리프레시 토큰과 일치하는지 확인
-        if (user != null && refreshToken.equals(
-            user.getRefreshToken().substring(BEARER_PREFIX.length()))) {
+        if (refreshToken.equals(
+                    user.getRefreshToken().substring(BEARER_PREFIX.length()))) {
             // 사용자 인증 설정
             setAuthentication(userId);
             // 요청 필터링 수행
@@ -165,7 +166,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             user.setRefreshToken(newRefreshToken);
             userRepository.save(user);
         } else {
-            log.error("User not found: " + userId);
+            log.error("User not found: {}", userId);
         }
     }
 

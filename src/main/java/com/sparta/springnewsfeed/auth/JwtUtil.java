@@ -47,12 +47,12 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    //ACCESS_TOKEN생성
+    //ACCESS_TOKEN 생성
     public String createAccessToken(String userId) {
         return createToken(userId, ACCESS_TOKEN_TIME);
     }
 
-    //REFRESH_TOKEN생성
+    //REFRESH_TOKEN 생성
     public String createRefreshToken(String userId) {
         return createToken(userId, REFRESH_TOKEN_TIME);
     }
@@ -70,7 +70,7 @@ public class JwtUtil {
         return BEARER_PREFIX + builder.compact();
     }
 
-    // Access Token 헤더에서 JWT 가져오기->post에서도 이거쓰면됨 동일코드
+    // Access Token 헤더에서 JWT 가져오기-> post에서도 이거쓰면됨 동일코드
     public String getAccessTokenFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {

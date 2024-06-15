@@ -68,8 +68,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
 
-
-    //사용자인증에 성공했을때(로그인한 사용자가 db에저장된 사용자일때)
+    //사용자인증에 성공했을때(로그인한 사용자가 db에 저장된 사용자일때)
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         log.info("JwtAuthenticationFilter: Authentication successful!");
@@ -77,7 +76,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String accessToken = jwtUtil.createAccessToken(userId);
         String refreshToken = jwtUtil.createRefreshToken(userId);
-
 
         //응답 헤더에 토큰을 담기
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken);
