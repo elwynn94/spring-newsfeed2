@@ -1,6 +1,5 @@
 package com.sparta.springnewsfeed.user.dto;
 
-
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.introspector.ConstructorPropertiesArbitraryIntrospector;
 import org.junit.jupiter.api.Test;
@@ -18,6 +17,7 @@ public class LoginRequestDtoTest {
         LoginRequestDto loginRequestDto = fixtureMonkey.giveMeOne(LoginRequestDto.class);
 
         // When: 생성된 데이터 검증
+
         // Then: 필드들이 null이 아닌지 확인
         assertNotNull(loginRequestDto.getUserId());
         assertNotNull(loginRequestDto.getPassword());
@@ -35,4 +35,39 @@ public class LoginRequestDtoTest {
         assertEquals("testUser", loginRequestDto.getUserId());
         assertEquals("testPassword", loginRequestDto.getPassword());
     }
+
+    @Test
+    public void testLoginRequestDtoEqualsAndHashCode() {
+        // Given
+        LoginRequestDto dto1 = fixtureMonkey.giveMeBuilder(LoginRequestDto.class)
+                .set("userId", "testUser")
+                .set("password", "testPassword")
+                .sample();
+        LoginRequestDto dto2 = fixtureMonkey.giveMeBuilder(LoginRequestDto.class)
+                .set("userId", "testUser")
+                .set("password", "testPassword")
+                .sample();
+
+        // When & Then
+        assertEquals(dto1, dto2);
+        assertEquals(dto1.hashCode(), dto2.hashCode());
+    }
+
+    @Test
+    public void testLoginRequestDtoToString() {
+        // Given
+        LoginRequestDto loginRequestDto = fixtureMonkey.giveMeBuilder(LoginRequestDto.class)
+                .set("userId", "testUser")
+                .set("password", "testPassword")
+                .sample();
+
+        // When
+        String toString = loginRequestDto.toString();
+
+        // Then
+        assertTrue(toString.contains("userId=testUser"));
+        assertTrue(toString.contains("password=testPassword"));
+    }
+
+
 }
