@@ -10,7 +10,6 @@ import com.sparta.springnewsfeed.user.dto.SignupRequestDto;
 import com.sparta.springnewsfeed.user.dto.UpdatePasswordRequestDto;
 import com.sparta.springnewsfeed.user.dto.UpdateProfileRequestDto;
 import com.sparta.springnewsfeed.user.dto.UserInquiryResponseDto;
-import com.sparta.springnewsfeed.user.kakao.KakaoService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +35,7 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-    private final KakaoService kakaoService;
+
 
 
     @Autowired
@@ -46,11 +45,10 @@ public class UserController {
 
 
     @Autowired
-    public UserController(UserService userService, JwtUtil jwtUtil, UserRepository userRepository, KakaoService kakaoService) {
+    public UserController(UserService userService, JwtUtil jwtUtil, UserRepository userRepository) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.userRepository=userRepository;
-        this.kakaoService = kakaoService;
     }
 
 
@@ -201,28 +199,6 @@ public class UserController {
         } else {
             return createResponse("Invalid access token", HttpStatus.UNAUTHORIZED);
         }
-    }
-
-
-    @GetMapping("/kakao/callback")
-    public String kakaoLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
-        String token = kakaoService.kakaoLogin(code);
-
-        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token.substring(7));
-        cookie.setPath("/");
-        response.addCookie(cookie);
-
-        return "redirect:/";
-    }
-
-    @PostMapping("/loginKakao")
-    public ResponseEntity<String> loginKakao(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
-        String token = kakaoService.kakaoLogin(code);
-
-        Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, token.substring(7));
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        return ResponseEntity.ok("Login successful");
     }
 }
 

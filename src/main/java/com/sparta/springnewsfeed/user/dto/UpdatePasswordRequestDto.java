@@ -5,9 +5,11 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.Value;
 
 @Getter
 @Setter
+@Value
 public class UpdatePasswordRequestDto {
 
     @NotBlank(message = "현재 비밀번호는 필수 입력 값입니다.")
