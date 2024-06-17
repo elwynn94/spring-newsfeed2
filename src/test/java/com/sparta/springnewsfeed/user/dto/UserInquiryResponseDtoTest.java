@@ -18,11 +18,11 @@ class UserInquiryResponseDtoTest {
         UserInquiryResponseDto userInquiryResponseDto = fixtureMonkey.giveMeOne(UserInquiryResponseDto.class);
 
         // When & Then: 필드들이 null이 아닌지 확인
-        assertNotNull(userInquiryResponseDto.getUserId());
-        assertNotNull(userInquiryResponseDto.getName());
-        assertNotNull(userInquiryResponseDto.getIntroduction());
-        assertNotNull(userInquiryResponseDto.getEmail());
-        assertNotNull(userInquiryResponseDto.getPictureURL());
+        assertNotNull(userInquiryResponseDto.userId());
+        assertNotNull(userInquiryResponseDto.name());
+        assertNotNull(userInquiryResponseDto.introduction());
+        assertNotNull(userInquiryResponseDto.email());
+        assertNotNull(userInquiryResponseDto.pictureURL());
     }
 
     @Test
@@ -37,11 +37,11 @@ class UserInquiryResponseDtoTest {
                 .sample();
 
         // When & Then: 필드 값이 예상한 대로 설정되었는지 확인
-        assertEquals("testUser1234", userInquiryResponseDto.getUserId());
-        assertEquals("Test Name", userInquiryResponseDto.getName());
-        assertEquals("This is a test introduction", userInquiryResponseDto.getIntroduction());
-        assertEquals("testuser@example.com", userInquiryResponseDto.getEmail());
-        assertEquals("http://example.com/picture.jpg", userInquiryResponseDto.getPictureURL());
+        assertEquals("testUser1234", userInquiryResponseDto.userId());
+        assertEquals("Test Name", userInquiryResponseDto.name());
+        assertEquals("This is a test introduction", userInquiryResponseDto.introduction());
+        assertEquals("testuser@example.com", userInquiryResponseDto.email());
+        assertEquals("http://example.com/picture.jpg", userInquiryResponseDto.pictureURL());
     }
 
     @Test
