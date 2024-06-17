@@ -26,7 +26,6 @@ public class PostController {
     private final PostService postService;
     private final JwtUtil jwtUtil;
 
-
     @PostMapping("/posts")
     public HttpStatusResponseDto createPost(@AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody Post post) {

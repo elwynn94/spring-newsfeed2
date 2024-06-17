@@ -38,9 +38,6 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private HttpServletResponse httpServletResponse;
-
 
     @Autowired
     public UserController(UserService userService, JwtUtil jwtUtil, UserRepository userRepository) {
@@ -59,15 +56,6 @@ public class UserController {
     private <T> ResponseEntity<T> createResponse(T body, HttpStatus status) {
         return new ResponseEntity<>(body, status);
     }
-
-
-    // 회원가입
-//    @PostMapping("/signup")
-//    public ResponseEntity<HttpStatusResponseDto> signup(@Validated @RequestBody SignupRequestDto requestDto) {
-//        ResponseCode responseCode = userService.signup(requestDto);
-//        HttpStatusResponseDto response = new HttpStatusResponseDto(responseCode);
-//        return new ResponseEntity<>(response, HttpStatus.valueOf(responseCode.getStatusCode()));
-//    }
 
     @PostMapping("/signup")
     public ResponseEntity<HttpStatusResponseDto> signup(@Validated @RequestBody SignupRequestDto requestDto) {

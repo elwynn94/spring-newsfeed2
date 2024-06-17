@@ -67,8 +67,6 @@ public class User extends Timestamped {
     @Column
     private String refreshToken;
 
-    private Long kakaoId;
-
     public User(String userId, String password, String email, String name, UserStatusEnum status) {
         this.userId = userId;
         this.password = password;
@@ -77,17 +75,11 @@ public class User extends Timestamped {
         this.status = status;
     }
 
-    public User(String userId, String password, String email, UserStatusEnum status, Long kakaoId) {
+    public User(String userId, String password, String email, UserStatusEnum status) {
         this.userId = userId;
         this.password = password;
         this.email = email;
         this.status = status;
-        this.kakaoId = kakaoId;
-    }
-
-    public User kakaoIdUpdate(Long kakaoId) {
-        this.kakaoId = kakaoId;
-        return this;
     }
 
     // 엔티티 관계
