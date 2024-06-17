@@ -23,6 +23,10 @@ public class LoggingAspect {
 
     @Before("controller()")
     public void logBefore(JoinPoint joinPoint) {
+
+        if (request == null) {
+            log.warn("RequestAttributes가 null 입니다!");
+        }
         String method = request.getMethod();
         String url = request.getRequestURL().toString();
         log.info("Request URL: {}, HTTP Method: {}", url, method);

@@ -109,11 +109,4 @@ class UserControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(userProfile, response.getBody());
     }
-
-
-
-
-
-
-
 }
