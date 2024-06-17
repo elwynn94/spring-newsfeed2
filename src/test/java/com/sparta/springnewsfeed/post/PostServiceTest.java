@@ -119,4 +119,19 @@ class PostServiceTest {
         // Then
         assertEquals(ResponseCode.ENTITY_NOT_FOUND.getStatusCode(), response.getStatusCode());
     }
+
+    @Test
+    @DisplayName("게시글 삭제: 성공")
+    void deletePost_Success() {
+        // Given
+        when(postRepository.findById(post.getId())).thenReturn(Optional.of(post));
+
+        // When
+        HttpStatusResponseDto response = postService.deletePost(user, post.getId());
+
+        // Then
+        assertEquals(ResponseCode.SUCCESS.getStatusCode(), response.getStatusCode());
+        verify(postRepository).delete(post);
+    }
+
 }
