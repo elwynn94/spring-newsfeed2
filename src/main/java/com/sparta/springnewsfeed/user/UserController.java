@@ -36,8 +36,6 @@ public class UserController {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
-
-
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -201,6 +199,3 @@ public class UserController {
         }
     }
 }
-
-
-

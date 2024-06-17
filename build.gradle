@@ -88,9 +88,9 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-test {
-    finalizedBy 'jacocoTestReport'
-}
+//test {
+//    finalizedBy 'jacocoTestReport'
+//}
 
 jacocoTestCoverageVerification {
     violationRules {
